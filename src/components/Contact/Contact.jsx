@@ -21,11 +21,11 @@ export default function Contact() {
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold pb-2">Email</h3>
-                  <p className="text-gray-600">mohamedkhaled-dev@outlook.com</p>
+                  <p className="text-gray-600">contact@example.com</p>
                 </div>
                 <div>
                   <h3 className="font-semibold pb-2">Phone</h3>
-                  <p className="text-gray-600">+20 (111) 881-5757</p>
+                  <p className="text-gray-600">+1 (555) 123-4567</p>
                 </div>
               </div>
             </div>

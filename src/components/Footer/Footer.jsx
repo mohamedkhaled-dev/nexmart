@@ -24,7 +24,7 @@ export default function Footer() {
                 <div className="flex gap-4">
                   {/* Updated Social Media Links */}
                   <a
-                    href="https://github.com/mohamedkhaled-dev"
+                    href="https://github.com"
                     target="_blank"
                     className="bg-white p-2 rounded-full group "
                     aria-label="GitHub"
@@ -38,7 +38,7 @@ export default function Footer() {
                     </svg>
                   </a>
                   <a
-                    href="https://www.linkedin.com/in/mohamedkhaled-eg"
+                    href="https://www.linkedin.com"
                     target="_blank"
                     className="bg-white p-2 rounded-full group"
                     aria-label="LinkedIn"
@@ -52,7 +52,7 @@ export default function Footer() {
                     </svg>
                   </a>
                   <a
-                    href="https://www.upwork.com/freelancers/~01873e8dc874f770f0"
+                    href="https://www.upwork.com"
                     target="_blank"
                     className="bg-white p-2 rounded-full group"
                     aria-label="Upwork"
