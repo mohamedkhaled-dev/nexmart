@@ -10,7 +10,6 @@ import { UserContext } from "../../context/UserContext";
 import { CartContext } from "../../context/CartContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { showToast } from "../../utils/toastConfig";
 import { useWishList } from "../../hooks/useWishList";
 import { jwtDecode } from "jwt-decode";
 
@@ -19,7 +18,7 @@ export default function Navbar() {
   const [isBannerOpen, setIsBannerOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const { userToken, setUserToken } = useContext(UserContext);
   const { cartCount, setCartCount } = useContext(CartContext);
   const navigate = useNavigate();
@@ -30,10 +29,19 @@ export default function Navbar() {
   const userName = userToken ? jwtDecode(userToken).name : null;
 
   useEffect(() => {
+    function handleClickOutside(event) {
+      if (isSearchExpanded && !event.target.closest(".search-container")) {
+        setIsSearchExpanded(false);
+        setSearchQuery("");
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
       setIsUserMenuOpen(false);
     };
-  }, [userToken]);
+  }, [isSearchExpanded, userToken]);
 
   // Navigation Links Data
   const navLinks = [
@@ -95,31 +103,27 @@ export default function Navbar() {
     <>
       <div className="border-b bg-white fixed top-0 right-0 left-0 z-20">
         {/* Discount Banner */}
-        <div
-          className={
-            isBannerOpen
-              ? "bg-black text-white overflow-hidden whitespace-nowrap relative"
-              : "hidden"
-          }
-        >
-          <button
-            type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md z-10 opacity-75 hover:scale-110 hover:opacity-100 transition-opacity"
-            onClick={() => setIsBannerOpen(false)}
-            aria-label="Close banner"
-          >
-            <i className="fas fa-close size-5"></i>
-          </button>
-          <div className="flex justify-between animate-slide">
-            {bannerMessages.map((message, index) => (
-              <p key={index} className="text-sm py-2 mr-8">
-                {message}
-              </p>
-            ))}
+        {isBannerOpen && (
+          <div className="bg-black text-white overflow-hidden whitespace-nowrap relative">
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md z-10 opacity-75 hover:scale-110 hover:opacity-100 transition-opacity"
+              onClick={() => setIsBannerOpen(false)}
+              aria-label="Close banner"
+            >
+              <i className="fas fa-close size-5"></i>
+            </button>
+            <div className="flex justify-between animate-slide">
+              {bannerMessages.map((message, index) => (
+                <p key={index} className="text-sm py-2 mr-8">
+                  {message}
+                </p>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Navbar */}
+        {/* Top Navigation */}
         <nav className="flex items-center justify-between px-4 lg:px-14 pb-4 pt-6">
           <Link to={"/"} className="-m-1.5 p-1.5">
             <img src={logo} alt="NexMart Logo" width={150} />
@@ -140,6 +144,7 @@ export default function Navbar() {
 
         {/* Main Navigation */}
         <nav className="flex items-center justify-between px-4 lg:px-14 pb-4">
+          {/* Desktop Navigation Links */}
           <div className="hidden lg:flex lg:gap-x-10 bg-primary p-1 rounded-full me-4">
             {navLinks.map((link, index) => (
               <NavLink
@@ -156,72 +161,69 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div
-            className={`flex items-center justify-center gap-4 transition-all duration-500 w-full lg:w-auto ${
-              isFocused && "flex-grow"
-            }`}
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            className="lg:hidden flex justify-center items-center size-12 bg-primary rounded-full font-bold me-4"
+            onClick={() => setIsMenuOpen(true)}
+            aria-label="Open menu"
           >
-            {/* Mobile Menu Button */}
-            <button
-              type="button"
-              className="lg:hidden flex justify-center items-center size-12 bg-primary rounded-full font-bold"
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <img className="size-7" src={menu} alt="mobile menu" />
-            </button>
+            <img className="size-7" src={menu} alt="mobile menu" />
+          </button>
 
+          {/* Search and Action Icons Container */}
+          <div className="flex items-center gap-4">
             {/* Search Bar */}
-            <div className="relative flex-1 w-full mx-auto">
-              <input
-                value={searchQuery}
-                onFocus={() => {
-                  setIsFocused(true);
-                }}
-                onBlur={() => {
-                  setIsFocused(false);
-                }}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="p-3 pe-16 rounded-full bg-primary w-full focus:outline-none focus:ring-2 focus:ring-black transition-all focus:flex-grow placeholder:text-sm"
-                type="text"
-                placeholder="Search product"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute top-1/2 -translate-y-1/2 right-12 p-1"
-                  aria-label="Clear search"
-                >
-                  <svg
-                    className="size-4 text-gray-500 hover:text-black transition-colors"
-                    fill="none"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+            <div
+              className={`relative search-container transition-all  ${
+                isSearchExpanded ? "flex-1" : "w-auto"
+              }`}
+            >
+              {isSearchExpanded ? (
+                <div className="flex items-center w-full">
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="p-3 pe-16 rounded-full bg-primary w-full focus:outline-none focus:ring-2 focus:ring-black transition-all placeholder:text-sm"
+                    type="text"
+                    placeholder="Search product"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => {
+                      setIsSearchExpanded(false);
+                      setSearchQuery("");
+                    }}
+                    className="absolute top-1/2 -translate-y-1/2 right-3 p-1"
+                    aria-label="Close search"
                   >
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                    <svg
+                      className="size-5 text-gray-500 hover:text-black transition-colors"
+                      fill="none"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsSearchExpanded(true)}
+                  className="flex justify-center items-center size-12 bg-primary rounded-full group"
+                  aria-label="Open search"
+                >
+                  <img
+                    className="size-6 group-hover:scale-110 transition-transform"
+                    src={search}
+                    alt="search icon"
+                  />
                 </button>
               )}
-              <button
-                onClick={() => {
-                  if (!searchQuery.trim()) {
-                    showToast.error("Please enter something to search");
-                    return;
-                  }
-                }}
-                className="absolute top-1/2 -translate-y-1/2 right-3 p-1 hover:scale-110 transition-transform"
-                aria-label="Search"
-              >
-                <img
-                  className="size-6 cursor-pointer"
-                  src={search}
-                  alt="search icon"
-                />
-              </button>
+
               {/* Search Results Dropdown */}
-              {searchQuery && (
+              {searchQuery && isSearchExpanded && (
                 <div className="absolute top-14 inset-x-0 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-2xl max-h-[80vh] overflow-hidden z-50">
                   <div className="sticky top-0 bg-white/90 backdrop-blur-sm p-4 border-b">
                     <h3 className="font-medium text-gray-900">
@@ -230,9 +232,9 @@ export default function Navbar() {
                   </div>
 
                   <div className="overflow-y-auto max-h-[60vh] scrollbar-hide">
-                    {filteredProducts.length > 0 ? (
+                    {filteredProducts?.length > 0 ? (
                       <div className="p-2">
-                        {filteredProducts.map((product) => (
+                        {filteredProducts?.map((product) => (
                           <Link
                             key={product.id}
                             onClick={() => setSearchQuery("")}
@@ -304,146 +306,150 @@ export default function Navbar() {
             </div>
 
             {/* Action Icons */}
-            {actionIcons.map((icon, index) => (
-              <NavLink
-                key={index}
-                to={icon.path}
-                className="flex justify-center items-center size-12 bg-primary rounded-full group relative"
-              >
-                {cartCount > 0 && icon.path === "/cart" && !!userToken && (
-                  <span className="absolute -top-2 -end-2 bg-black text-white rounded-full size-6 flex justify-center items-center text-sm">
-                    {cartCount}
-                  </span>
-                )}
-                {icon.showBadge && icon.path === "/wishlist" && (
-                  <span className="absolute -top-0 -end-0 bg-black rounded-full size-2"></span>
-                )}
-                <img
-                  className={`${icon.size} group-hover:scale-110 transition-transform`}
-                  src={icon.icon}
-                  alt={icon.alt}
-                />
-              </NavLink>
-            ))}
-
-            {/* User Menu */}
-            <div className="relative">
-              {userToken ? (
-                <>
-                  <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            {!isSearchExpanded && (
+              <>
+                {actionIcons.map((icon, index) => (
+                  <NavLink
+                    key={index}
+                    to={icon.path}
                     className="flex justify-center items-center size-12 bg-primary rounded-full group relative"
                   >
+                    {cartCount > 0 && icon.path === "/cart" && !!userToken && (
+                      <span className="absolute -top-2 -end-2 bg-black text-white rounded-full size-6 flex justify-center items-center text-sm">
+                        {cartCount}
+                      </span>
+                    )}
+                    {icon.showBadge && icon.path === "/wishlist" && (
+                      <span className="absolute -top-0 -end-0 bg-black rounded-full size-2"></span>
+                    )}
                     <img
-                      className="size-6 group-hover:scale-110 transition-transform"
-                      src={user}
-                      alt="user menu"
+                      className={`${icon.size} group-hover:scale-110 transition-transform`}
+                      src={icon.icon}
+                      alt={icon.alt}
                     />
-                  </button>
+                  </NavLink>
+                ))}
 
-                  {/* Dropdown Menu */}
-                  {isUserMenuOpen && (
+                {/* User Menu */}
+                <div className="relative">
+                  {userToken ? (
                     <>
-                      {/* Backdrop */}
-                      <div
-                        className="fixed inset-0 z-20"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      />
+                      <button
+                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                        className="flex justify-center items-center size-12 bg-primary rounded-full group relative"
+                      >
+                        <img
+                          className="size-6 group-hover:scale-110 transition-transform"
+                          src={user}
+                          alt="user menu"
+                        />
+                      </button>
 
-                      {/* Menu */}
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-30 border">
-                        <div className="px-4 py-3 border-b">
-                          <p className="text-sm text-gray-700 truncate">
-                            {userName}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            Welcome back!
-                          </p>
-                        </div>
+                      {/* Dropdown Menu */}
+                      {isUserMenuOpen && (
+                        <>
+                          {/* Backdrop */}
+                          <div
+                            className="fixed inset-0 z-20"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          />
 
-                        <Link
-                          to="/orders"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          <svg
-                            className="size-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                            />
-                          </svg>
-                          My Orders
-                        </Link>
+                          {/* Menu */}
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-30 border">
+                            <div className="px-4 py-3 border-b">
+                              <p className="text-sm text-gray-700 truncate">
+                                {userName}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                Welcome back!
+                              </p>
+                            </div>
 
-                        <Link
-                          to="/wishlist"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          <svg
-                            className="size-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                            />
-                          </svg>
-                          Wishlist
-                        </Link>
-
-                        <div className="border-t mt-1">
-                          <button
-                            onClick={() => {
-                              handleLogout();
-                              setIsUserMenuOpen(false);
-                            }}
-                            className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                          >
-                            <svg
-                              className="size-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                            <Link
+                              to="/orders"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                              />
-                            </svg>
-                            Logout
-                          </button>
-                        </div>
-                      </div>
+                              <svg
+                                className="size-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                />
+                              </svg>
+                              My Orders
+                            </Link>
+
+                            <Link
+                              to="/wishlist"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
+                              <svg
+                                className="size-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                              Wishlist
+                            </Link>
+
+                            <div className="border-t mt-1">
+                              <button
+                                onClick={() => {
+                                  handleLogout();
+                                  setIsUserMenuOpen(false);
+                                }}
+                                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                              >
+                                <svg
+                                  className="size-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                  />
+                                </svg>
+                                Logout
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </>
+                  ) : (
+                    <NavLink
+                      to="/login"
+                      className="flex justify-center items-center size-12 bg-primary rounded-full group"
+                    >
+                      <img
+                        className="size-6 group-hover:scale-110 transition-transform"
+                        src={user}
+                        alt="login"
+                      />
+                    </NavLink>
                   )}
-                </>
-              ) : (
-                <NavLink
-                  to="/login"
-                  className="flex justify-center items-center size-12 bg-primary rounded-full group"
-                >
-                  <img
-                    className="size-6 group-hover:scale-110 transition-transform"
-                    src={user}
-                    alt="login"
-                  />
-                </NavLink>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
         </nav>
 
