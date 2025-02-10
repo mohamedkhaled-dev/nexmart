@@ -134,7 +134,7 @@ export default function Navbar() {
               <NavLink
                 key={index}
                 to={link.path}
-                className="text-sm/6 font-semibold text-gray-600 hover:text-gray-950 transition-colors"
+                className="text-sm/6 font-semibold text-gray-600 text-center hover:text-gray-950 transition-colors"
               >
                 {link.label}
               </NavLink>

@@ -198,19 +198,19 @@ export default function Cart() {
     <>
       <div className="min-h-screen pt-40 pb-12">
         {/* Cart Header */}
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex flex-col items-start sm:flex-row sm:justify-between mb-12">
           <div>
             <h2 className="text-4xl font-bold mb-2">My Cart</h2>
           </div>
-          <div className="flex gap-6 items-end">
-            <div className="text-center">
+          <div className="flex self-end items-end">
+            <div className="text-center pe-4">
               <p className="text-xl font-semibold">{cart?.products?.length}</p>
-              <p className="text-gray-500 text-sm">Cart Items</p>
+              <p className="text-gray-500 text-base">Cart Items</p>
             </div>
-            <div className="border-l border-gray-100 pl-6">
+            <div className="border-l border-gray-100 ps-4">
               <button
                 onClick={() => clearCart()}
-                className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-500 transition-colors"
+                className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-500 transition-colors text-base"
               >
                 <svg
                   className="size-5"
@@ -225,7 +225,7 @@ export default function Cart() {
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
-                <span className="text-sm">Clear All</span>
+                <span >Clear All</span>
               </button>
             </div>
           </div>
@@ -243,7 +243,7 @@ export default function Cart() {
                         {/* Product Image */}
                         <Link
                           to={`/products/${product.product.category.name}/${product.product.id}`}
-                          className="relative size-48  bg-gray-50 rounded-xl p-3 flex-shrink-0 overflow-hidden"
+                          className="relative w-1/3 sm:size-48  bg-gray-50 rounded-xl p-3 flex-shrink-0 overflow-hidden"
                         >
                           <img
                             src={product.product.imageCover}
@@ -266,26 +266,26 @@ export default function Cart() {
                           </p>
 
                           {/* Price Row */}
-                          <div className="flex justify-between items-center mt-2">
+                          <div className=" mt-2">
                             <p className="text-sm text-gray-500">
                               {product.price} EGP{" "}
                               <span className="text-[0.5rem]">/</span> item
                             </p>
-                            <p className="font-semibold text-lg pe-4">
+                          </div>
+
+                          {/* Stock Status */}
+                          <div className="flex flex-col justify-between items-start mt-2 text-sm gap-2">
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="size-2 rounded-full bg-green-500" />
+                              <span className=" text-green-500">In Stock</span>
+                            </div>
+                            <p className="font-semibold pe-4 self-end">
                               {product.price * product.count} EGP
                             </p>
                           </div>
 
-                          {/* Stock Status */}
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="size-2 rounded-full bg-green-500" />
-                            <span className="text-sm text-green-500">
-                              In Stock
-                            </span>
-                          </div>
-
                           {/* Controls Row */}
-                          <div className="flex justify-end items-center gap-4 mt-8 pe-4 ">
+                          <div className="flex justify-end items-center gap-4 mt-8 pe-4 flex-wrap">
                             {/* Quantity Controls */}
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-gray-400">Qty</span>

@@ -130,8 +130,8 @@ export default function Register() {
               )}
             </div>
 
-            <div className="flex justify-between gap-4">
-              <div className="w-1/2">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="w-full sm:w-1/2">
                 <label
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 pb-2"
@@ -156,7 +156,7 @@ export default function Register() {
                 )}
               </div>
 
-              <div className="w-1/2">
+              <div className="w-full sm:w-1/2">
                 <label
                   htmlFor="confirmPassword"
                   className="block text-sm font-medium text-gray-700 pb-2"

@@ -144,18 +144,18 @@ export default function Wishlist() {
   return (
     <div className="min-h-screen pt-40 pb-12">
       {/* Header with Stats */}
-      <div className="flex items-end justify-between mb-12">
+      <div className="flex flex-col items-start sm:flex-row sm:justify-between mb-12">
         <div>
           <h2 className="text-4xl font-bold mb-2">My Wishlist</h2>
         </div>
-        <div className="flex gap-6 text-center">
-          <div>
+        <div className="flex self-end text-center">
+          <div className="pe-2">
             <p className="text-xl font-semibold">{wishlist?.length}</p>
-            <p className="text-gray-500 text-sm">Saved Items</p>
+            <p className="text-gray-500 text-base">Saved Items</p>
           </div>
-          <div className="border-l border-gray-200 pl-6">
+          <div className="border-l border-gray-200 ps-2">
             <p className="text-xl font-semibold">{totalValue.toFixed(2)} EGP</p>
-            <p className="text-gray-500 text-sm text-end">Total Value</p>
+            <p className="text-gray-500 text-base text-end">Total Value</p>
           </div>
         </div>
       </div>

@@ -120,12 +120,12 @@ export default function FeaturedProducts() {
           .length > 0 ? (
           <div key={category._id} className="mb-12">
             {/* Category Header */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold">{category.name}</h2>
+            <div className="flex flex-col gap-2 mb-6">
+              <h2 className="text-3xl font-bold ">{category.name}</h2>
               <button
                 to="/products"
                 onClick={() => handleNavigation(category.name)}
-                className="bg-white border text-black px-6 py-3 rounded-full hover:-translate-y-[0.1rem] transition-transform duration-300"
+                className="bg-white border text-black px-6 py-3 rounded-full hover:-translate-y-[0.1rem] transition-transform duration-300 self-end"
               >
                 Show more
               </button>

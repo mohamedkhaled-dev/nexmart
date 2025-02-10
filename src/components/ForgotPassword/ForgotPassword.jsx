@@ -93,7 +93,7 @@ export default function ForgotPassword() {
 
                 <NavLink
                   to="/login"
-                  className="flex-1 bg-white text-black border border-black py-3 px-6 rounded-full text-center hover:-translate-y-[0.1rem] transition-transform duration-300"
+                  className="flex-1 flex justify-center items-center bg-white text-black border border-black py-3 px-6 rounded-full text-center hover:-translate-y-[0.1rem] transition-transform duration-300"
                 >
                   Back to Login
                 </NavLink>
